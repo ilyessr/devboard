@@ -215,7 +215,3 @@ Planned features include:
 - Docker environment
 - CI/CD pipeline
 - Deployment on a VPS
-
-```
-
-```
