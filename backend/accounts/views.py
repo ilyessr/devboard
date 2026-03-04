@@ -4,6 +4,9 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .serializers import RegisterSerializer, UserSerializer
 from .jwt import EmailTokenObtainPairSerializer
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 class RegisterAPIView(CreateAPIView):
@@ -21,3 +24,14 @@ class MeAPIView(RetrieveAPIView):
 
 class LoginAPIView(TokenObtainPairView):
     serializer_class = EmailTokenObtainPairSerializer
+
+
+class CookieTokenRefreshView(APIView):
+    def post(self, request):
+        refresh = request.COOKIES.get("refresh_token")
+
+        if not refresh:
+            return Response(status=401)
+
+        token = RefreshToken(refresh)
+        return Response({"access": str(token.access_token)})

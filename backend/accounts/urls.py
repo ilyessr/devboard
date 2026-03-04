@@ -1,10 +1,10 @@
 from django.urls import path
-from rest_framework_simplejwt.views import TokenRefreshView
-from .views import RegisterAPIView, LoginAPIView, MeAPIView
+from .views import RegisterAPIView, LoginAPIView, MeAPIView, CookieTokenRefreshView
 
 urlpatterns = [
     path("register/", RegisterAPIView.as_view()),
     path("login/", LoginAPIView.as_view()),
-    path("refresh/", TokenRefreshView.as_view()),
+    path("refresh/", CookieTokenRefreshView.as_view(), name="token_refresh"),
     path("me/", MeAPIView.as_view()),
 ]
+x
