@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -134,3 +135,18 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
 }
+
+CORS_ALLOW_CREDENTIALS = True
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": False,
+}
+
+AUTH_REFRESH_COOKIE = "refresh_token"
+AUTH_REFRESH_COOKIE_HTTP_ONLY = True
+AUTH_REFRESH_COOKIE_SECURE = not DEBUG
+AUTH_REFRESH_COOKIE_SAMESITE = "Lax"
+AUTH_REFRESH_COOKIE_PATH = "/api/auth/"
