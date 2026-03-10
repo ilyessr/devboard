@@ -4,6 +4,8 @@ from .views import (
     BoardRetrieveUpdateDestroyAPIView,
     ColumnListCreateAPIView,
     ColumnDestroyAPIView,
+    CardListCreateAPIView,
+    CardDestroyAPIView,
 )
 
 urlpatterns = [
@@ -15,4 +17,10 @@ urlpatterns = [
         name="column-list-create",
     ),
     path("columns/<int:pk>/", ColumnDestroyAPIView.as_view(), name="column-delete"),
+    path(
+        "columns/<int:column_id>/cards/",
+        CardListCreateAPIView.as_view(),
+        name="card-list-create",
+    ),
+    path("cards/<int:pk>/", CardDestroyAPIView.as_view(), name="card-delete"),
 ]

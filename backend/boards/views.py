@@ -2,8 +2,8 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 
-from .models import Board, Column
-from .serializers import BoardSerializer, ColumnSerializer
+from .models import Board, Column, Card
+from .serializers import BoardSerializer, ColumnSerializer, CardSerializer
 
 
 class BoardListCreateAPIView(generics.ListCreateAPIView):
@@ -49,3 +49,33 @@ class ColumnDestroyAPIView(generics.DestroyAPIView):
 
     def get_queryset(self):
         return Column.objects.filter(board__owner=self.request.user)
+
+
+class CardListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = CardSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        column = get_object_or_404(
+            Column,
+            id=self.kwargs["column_id"],
+            board__owner=self.request.user,
+        )
+        return column.cards.all()
+
+    def perform_create(self, serializer):
+        column = get_object_or_404(
+            Column,
+            id=self.kwargs["column_id"],
+            board__owner=self.request.user,
+        )
+        next_position = column.cards.count()
+        serializer.save(column=column, position=next_position)
+
+
+class CardDestroyAPIView(generics.DestroyAPIView):
+    serializer_class = CardSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Card.objects.filter(column__board__owner=self.request.user)

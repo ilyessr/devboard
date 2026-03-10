@@ -32,3 +32,22 @@ class Column(models.Model):
 
     def __str__(self):
         return f"{self.board.name} - {self.name}"
+
+
+class Card(models.Model):
+    column = models.ForeignKey(
+        Column,
+        on_delete=models.CASCADE,
+        related_name="cards",
+    )
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    position = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["position", "id"]
+
+    def __str__(self):
+        return self.title
