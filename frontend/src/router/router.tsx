@@ -5,7 +5,7 @@ import BoardsPage from "@/pages/BoardsPage";
 
 import { RequireAuth } from "@/components/RequireAuth";
 import { Layout } from "@/components/Layout";
-import BoardDetailPage from "@/pages/BoardDeteilPage";
+import BoardDetailPage from "@/pages/BoardDetailPage";
 
 export const router = createBrowserRouter([
   {
