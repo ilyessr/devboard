@@ -6,6 +6,11 @@ export async function getBoards(): Promise<Board[]> {
   return res.data;
 }
 
+export async function getBoard(boardId: number): Promise<Board> {
+  const res = await apiClient.get(`boards/${boardId}/`);
+  return res.data;
+}
+
 export async function createBoard(input: { name: string }): Promise<Board> {
   const res = await apiClient.post("boards/", input);
   return res.data;

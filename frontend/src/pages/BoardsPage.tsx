@@ -1,5 +1,6 @@
 import { useBoards, useDeleteBoard } from "@/features/boards/hooks";
 import { CreateBoardForm } from "@/features/boards/CreateBoardForm";
+import { Link } from "react-router-dom";
 
 export default function BoardsPage() {
   const { data: boards, isLoading, isError } = useBoards();
@@ -29,7 +30,7 @@ export default function BoardsPage() {
               marginBottom: 12,
             }}
           >
-            <span>{board.name}</span>
+            <Link to={`/boards/${board.id}`}>{board.name}</Link>
 
             <button onClick={() => deleteBoard.mutate(board.id)}>Delete</button>
           </li>
