@@ -1,7 +1,8 @@
 import { useParams } from "react-router-dom";
 import { useBoard } from "@/features/boards/hooks";
-import { useColumns, useDeleteColumn } from "@/features/columns/hooks";
+import { useColumns } from "@/features/columns/hooks";
 import { CreateColumnForm } from "@/features/columns/CreateColumnForm";
+import { ColumnPanel } from "@/features/columns/ColumnPanel";
 
 export default function BoardDetailPage() {
   const params = useParams();
@@ -17,7 +18,6 @@ export default function BoardDetailPage() {
     isLoading: columnsLoading,
     isError: columnsError,
   } = useColumns(boardId);
-  const deleteColumn = useDeleteColumn(boardId);
 
   if (!boardId || Number.isNaN(boardId)) {
     return <p>Invalid board id.</p>;
@@ -52,32 +52,7 @@ export default function BoardDetailPage() {
         }}
       >
         {columns?.map((column) => (
-          <div
-            key={column.id}
-            style={{
-              minWidth: 260,
-              padding: 16,
-              border: "1px solid #ddd",
-              borderRadius: 8,
-              background: "#fafafa",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: 12,
-              }}
-            >
-              <strong>{column.name}</strong>
-              <button onClick={() => deleteColumn.mutate(column.id)}>
-                Delete
-              </button>
-            </div>
-
-            <p style={{ opacity: 0.6, margin: 0 }}>No cards yet.</p>
-          </div>
+          <ColumnPanel key={column.id} column={column} boardId={boardId} />
         ))}
       </div>
     </div>
