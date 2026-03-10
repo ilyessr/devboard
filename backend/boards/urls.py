@@ -1,7 +1,7 @@
 from django.urls import path
-from .views import BoardListCreateAPIView, BoardDetailAPIView
+from .views import BoardListCreateAPIView, BoardRetrieveUpdateDestroyAPIView
 
 urlpatterns = [
-    path("boards/", BoardListCreateAPIView.as_view()),
-    path("boards/<int:pk>/", BoardDetailAPIView.as_view()),
+    path("", BoardListCreateAPIView.as_view(), name="board-list-create"),
+    path("<int:pk>/", BoardRetrieveUpdateDestroyAPIView.as_view(), name="board-detail"),
 ]

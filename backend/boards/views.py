@@ -1,12 +1,12 @@
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from .models import Board
 from .serializers import BoardSerializer
 
 
-class BoardListCreateAPIView(ListCreateAPIView):
-    permission_classes = [IsAuthenticated]
+class BoardListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = BoardSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Board.objects.filter(owner=self.request.user).order_by("-created_at")
@@ -15,9 +15,9 @@ class BoardListCreateAPIView(ListCreateAPIView):
         serializer.save(owner=self.request.user)
 
 
-class BoardDetailAPIView(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated]
+class BoardRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = BoardSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Board.objects.filter(owner=self.request.user)

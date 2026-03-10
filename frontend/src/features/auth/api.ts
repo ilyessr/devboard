@@ -1,18 +1,5 @@
 import { apiClient } from "@/lib/apiClient";
-
-export type LoginInput = {
-  email: string;
-  password: string;
-};
-
-export type AuthResponse = {
-  access: string;
-};
-
-export type Me = {
-  id: number;
-  email: string;
-};
+import type { AuthResponse, LoginInput, Me } from "./types";
 
 export async function login(data: LoginInput): Promise<AuthResponse> {
   const res = await apiClient.post("auth/login/", data);
