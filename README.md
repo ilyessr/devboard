@@ -1,15 +1,17 @@
 # DevBoard
 
 DevBoard is a full-stack web application inspired by tools like **Trello** or **Jira**.
-The project demonstrates a modern **React + Django architecture** with secure authentication, clean frontend structure, and scalable API design.
+The goal of this project is to demonstrate a modern **React + Django architecture** with clean frontend structure, secure authentication, and scalable API design.
 
-At the current stage, the project includes:
+The application currently supports:
 
-- A **React frontend** with React Query and Axios
-- A **Django REST API**
-- A secure **JWT authentication system**
+- User authentication with **JWT**
 - **HttpOnly refresh cookies**
-- Protected routes and automatic token refresh
+- Boards with **columns and cards**
+- A **Kanban-style interface**
+- React Query data management
+- Automatic token refresh with Axios
+- Demo data seeding for quick testing
 
 ---
 
@@ -21,6 +23,8 @@ At the current stage, the project includes:
 - TypeScript
 - Vite
 - React Router
+- React Hook Form
+- Zod validation
 - TanStack Query (React Query)
 - Axios
 
@@ -47,39 +51,28 @@ devboard/
 │   └── src/
 │       ├── features/
 │       │   ├── auth/
-│       │   │   ├── api.ts
-│       │   │   ├── hooks.ts
-│       │   │   └── tokenStore.ts
-│       │   │
+│       │   ├── boards/
+│       │   ├── columns/
+│       │   ├── cards/
 │       │   └── health/
-│       │       ├── api.ts
-│       │       ├── hooks.ts
-│       │       └── HealthPanel.tsx
-│       │
-│       ├── components/
-│       │   ├── Layout.tsx
-│       │   └── RequireAuth.tsx
 │       │
 │       ├── pages/
 │       │   ├── HomePage.tsx
 │       │   ├── LoginPage.tsx
-│       │   └── BoardsPage.tsx
+│       │   ├── BoardsPage.tsx
+│       │   └── BoardDetailPage.tsx
 │       │
+│       ├── components/
 │       ├── router/
-│       │   └── router.tsx
-│       │
 │       └── lib/
-│           ├── apiClient.ts
-│           ├── queryClient.ts
-│           └── authRefresh.ts
 │
 ├── backend/
 │   ├── config/
-│   ├── core/        # technical endpoints (health check)
-│   └── accounts/    # authentication logic
+│   ├── accounts/
+│   ├── boards/
+│   └── core/
 │
 ├── infra/
-│
 ├── Makefile
 └── README.md
 ```
@@ -90,43 +83,51 @@ devboard/
 
 The backend is organized into dedicated Django apps.
 
-## core
-
-Contains technical endpoints used for system checks.
-
-Example:
-
-```
-GET /api/health/
-```
-
-Used to verify communication between the frontend and backend.
-
----
-
 ## accounts
 
 Handles authentication and user management.
 
-Key elements:
+Features:
 
 - Custom **User model based on email**
-- DRF **serializers for validation**
-- **Class-based views** (`CreateAPIView`, `RetrieveAPIView`)
 - JWT authentication with **SimpleJWT**
+- Refresh tokens stored in **HttpOnly cookies**
+- DRF class-based views and serializers
+
+## boards
+
+Handles the Kanban domain model.
+
+Entities:
+
+```
+Board
+ └── Column
+       └── Card
+```
+
+Each board belongs to a user.
+Columns belong to a board.
+Cards belong to a column.
+
+API endpoints are protected with `IsAuthenticated`.
 
 ---
 
 # Authentication System
 
-The application uses a **secure JWT authentication strategy**.
+The application uses a **secure JWT strategy**.
 
-| Token         | Storage              | Purpose                    |
-| ------------- | -------------------- | -------------------------- |
-| Access Token  | In memory (frontend) | Authenticate API requests  |
-| Refresh Token | **HttpOnly cookie**  | Generate new access tokens |
+| Token         | Storage              | Purpose                   |
+| ------------- | -------------------- | ------------------------- |
+| Access Token  | In memory (frontend) | Authenticate API requests |
+| Refresh Token | **HttpOnly cookie**  | Issue new access tokens   |
 
-This design protects the refresh token from **XSS attacks**, while keeping authentication seamless for the user.
+### Security benefits
+
+- Refresh tokens cannot be accessed by JavaScript
+- Protection against **XSS token theft**
+- Automatic token refresh handled by Axios interceptors
 
 ---
 
@@ -140,69 +141,47 @@ GET  /api/auth/me/
 POST /api/auth/logout/
 ```
 
----
+### Login flow
 
-# Login Flow
+1. User submits credentials
+2. Backend returns:
+   - an **access token**
+   - a **refresh token stored in an HttpOnly cookie**
 
-1. The user sends credentials:
-
-```
-POST /api/auth/login/
-```
-
-2. The backend returns:
-
-- an **access token** in the JSON response
-- a **refresh token stored in an HttpOnly cookie**
-
-Example response headers:
+Example response header:
 
 ```
 Set-Cookie: refresh_token=...; HttpOnly; SameSite=Lax
 ```
 
-The browser **automatically stores the cookie** when it receives the response.
-
-The frontend stores the access token **in memory only**.
+The browser automatically stores the cookie.
 
 ---
 
-# Token Refresh Flow
+# Kanban Features
 
-When the access token expires:
+The current application allows users to:
 
-1. An API request returns **401 Unauthorized**
-2. The Axios interceptor automatically sends:
+- create boards
+- create columns inside boards
+- create cards inside columns
+- delete boards, columns, and cards
+- navigate through boards with React Router
 
-```
-POST /api/auth/refresh/
-```
-
-3. The browser automatically includes the refresh cookie:
-
-```
-Cookie: refresh_token=...
-```
-
-4. The backend validates the refresh token and returns a new access token
-5. The original request is retried automatically
-
-This entire process happens **without interrupting the user experience**.
-
----
-
-# Logout
-
-Logging out removes the refresh cookie:
+Example structure:
 
 ```
-POST /api/auth/logout/
-```
+Demo Project
 
-The backend clears the cookie using:
+Todo
+  Setup project
+  Create authentication
 
-```
-response.delete_cookie(...)
+Doing
+  Build board UI
+
+Done
+  Design architecture
 ```
 
 ---
@@ -211,20 +190,26 @@ response.delete_cookie(...)
 
 The frontend follows a **feature-based architecture**.
 
-Each feature groups related logic together:
+Example:
 
 ```
-features/auth
-  api.ts
-  hooks.ts
-  tokenStore.ts
+features/
+  boards/
+    api.ts
+    hooks.ts
+    types.ts
+  columns/
+    ColumnPanel.tsx
+    CreateColumnForm.tsx
+  cards/
+    CreateCardForm.tsx
 ```
 
 Benefits:
 
-- better scalability
-- easier maintenance
-- clear separation of concerns
+- separation of concerns
+- easier scaling
+- clearer domain logic
 
 ---
 
@@ -238,28 +223,25 @@ src/lib/apiClient.ts
 
 Responsibilities:
 
-- attach `Authorization: Bearer <access_token>`
-- automatically send cookies
+- attach `Authorization: Bearer <token>`
+- send cookies automatically
 - refresh expired tokens
 - retry failed requests
-
-This avoids duplicating authentication logic across the application.
 
 ---
 
 # Routing
 
-The application uses **React Router** with a shared layout.
-
-Current routes:
+Routes currently implemented:
 
 ```
 /
 /login
 /boards
+/boards/:boardId
 ```
 
-Protected routes use a `RequireAuth` component to ensure the user is authenticated.
+Protected routes are handled by a `RequireAuth` component.
 
 ---
 
@@ -273,29 +255,28 @@ Protected routes use a `RequireAuth` component to ensure the user is authenticat
 
 ---
 
-# Running the Project
-
-## Start the backend
+# Install Dependencies
 
 ```
-cd backend
-source .venv/bin/activate
-python manage.py runserver
-```
-
-Backend runs on:
-
-```
-http://127.0.0.1:8000
+npm install --prefix frontend
+pip install -r backend/requirements.txt
 ```
 
 ---
 
-## Start the frontend
+# Running the Project
+
+Start backend:
+
+```
+cd backend
+python manage.py runserver
+```
+
+Start frontend:
 
 ```
 cd frontend
-npm install
 npm run dev
 ```
 
@@ -305,90 +286,8 @@ Frontend runs on:
 http://localhost:5173
 ```
 
----
-
-# Development Commands
-
-A **Makefile** simplifies development commands.
-
-Run backend:
+Backend runs on:
 
 ```
-make backend
+http://127.
 ```
-
-Run frontend:
-
-```
-make frontend
-```
-
-Run both services:
-
-```
-make dev
-```
-
----
-
-# API Communication
-
-During development, the frontend communicates with Django through a **Vite proxy**.
-
-Frontend requests:
-
-```
-/api/*
-```
-
-are proxied to:
-
-```
-http://127.0.0.1:8000
-```
-
-This avoids CORS issues and mirrors a production reverse-proxy setup.
-
----
-
-# Security Considerations
-
-The authentication system follows several best practices:
-
-- Refresh tokens stored in **HttpOnly cookies**
-- Access tokens stored **only in memory**
-- Automatic token refresh with Axios interceptors
-- Protected endpoints using `IsAuthenticated`
-- Custom user model with **email-based authentication**
-
----
-
-# Current Features
-
-## Backend
-
-- Django REST API
-- Custom user model (email login)
-- JWT authentication with cookie-based refresh
-- `/api/auth/me/` endpoint
-
-## Frontend
-
-- React + TypeScript
-- React Router navigation
-- React Query for data fetching
-- Axios API client with automatic refresh
-- Protected routes
-
----
-
-# Next Steps
-
-Planned features include:
-
-- Boards CRUD API
-- Cards and Kanban board system
-- Drag & Drop interactions
-- Docker environment
-- CI/CD pipeline
-- Deployment on a VPS
