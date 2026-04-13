@@ -1,19 +1,22 @@
-import { createBrowserRouter } from "react-router-dom";
-import HomePage from "@/pages/HomePage";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import LoginPage from "@/pages/LoginPage";
 import BoardsPage from "@/pages/BoardsPage";
-
 import { RequireAuth } from "@/components/RequireAuth";
 import { Layout } from "@/components/Layout";
 import BoardDetailPage from "@/pages/BoardDetailPage";
+import { RequireGuest } from "@/components/RequireGuest";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout />,
     children: [
-      { index: true, element: <HomePage /> },
-      { path: "login", element: <LoginPage /> },
+      { index: true, element: <Navigate to="/login" replace /> },
+
+      {
+        element: <RequireGuest />,
+        children: [{ path: "login", element: <LoginPage /> }],
+      },
 
       {
         element: <RequireAuth />,

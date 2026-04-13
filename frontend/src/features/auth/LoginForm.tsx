@@ -1,12 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { useLogin } from "./hooks";
-import { useNavigate } from "react-router-dom";
 
 const loginSchema = z.object({
-  email: z.email("Please enter a valid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters long"),
+  email: z.email("Veuillez saisir un email valide"),
+  password: z.string().min(8, "Le mot de passe doit contenir au moins 8 caractères"),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -33,41 +33,32 @@ export function LoginForm() {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 12,
-        maxWidth: 400,
-      }}
-    >
-      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-        <input placeholder="Email" {...register("email")} />
-        {errors.email && (
-          <p style={{ color: "red", margin: 0 }}>{errors.email.message}</p>
-        )}
-      </div>
+    <form className="form-stack" onSubmit={handleSubmit(onSubmit)}>
+      <label className="field">
+        <span>Email</span>
+        <input type="email" autoComplete="email" placeholder="you@example.com" {...register("email")} />
+        {errors.email && <p className="field-error">{errors.email.message}</p>}
+      </label>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+      <label className="field">
+        <span>Mot de passe</span>
         <input
           type="password"
-          placeholder="Password"
+          autoComplete="current-password"
+          placeholder="••••••••"
           {...register("password")}
         />
-        {errors.password && (
-          <p style={{ color: "red", margin: 0 }}>{errors.password.message}</p>
-        )}
-      </div>
+        {errors.password && <p className="field-error">{errors.password.message}</p>}
+      </label>
 
-      <button type="submit" disabled={login.isPending}>
-        {login.isPending ? "Signing in..." : "Login"}
+      <button type="submit" className="btn btn-primary" disabled={login.isPending}>
+        {login.isPending ? "Connexion..." : "Se connecter"}
       </button>
 
+      <p className="hint">Demo: demo@example.com / demo1234</p>
+
       {login.isError && (
-        <p style={{ color: "red", margin: 0 }}>
-          Invalid credentials or server error.
-        </p>
+        <p className="field-error">Identifiants invalides ou erreur serveur.</p>
       )}
     </form>
   );
