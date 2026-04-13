@@ -3,6 +3,7 @@ type IconName =
   | "login"
   | "boards"
   | "plus"
+  | "close"
   | "trash"
   | "edit"
   | "more"
@@ -56,6 +57,13 @@ export function Icon({ name, className }: IconProps) {
       return (
         <svg {...baseProps}>
           <path d="M12 5v14M5 12h14" />
+        </svg>
+      );
+    case "close":
+      return (
+        <svg {...baseProps}>
+          <path d="M6 6l12 12" />
+          <path d="M18 6L6 18" />
         </svg>
       );
     case "trash":

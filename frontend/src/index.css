@@ -555,6 +555,15 @@ textarea:focus {
   font-size: 1.08rem;
 }
 
+.modal__close-btn {
+  color: var(--danger);
+}
+
+.modal__close-icon {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
 .modal__content {
   padding: 0.2rem 1rem 1rem;
 }

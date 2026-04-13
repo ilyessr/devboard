@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import type { ReactNode } from "react";
+import { Icon } from "./Icon";
 
 type ModalProps = {
   isOpen: boolean;
@@ -31,8 +32,13 @@ export function Modal({ isOpen, title, onClose, children }: ModalProps) {
       >
         <div className="modal__header">
           <h2>{title}</h2>
-          <button type="button" className="btn btn-ghost" onClick={onClose}>
-            Fermer
+          <button
+            type="button"
+            className="btn btn-ghost btn-icon modal__close-btn"
+            onClick={onClose}
+            aria-label="Fermer"
+          >
+            <Icon name="close" className="icon modal__close-icon" />
           </button>
         </div>
         <div className="modal__content">{children}</div>
