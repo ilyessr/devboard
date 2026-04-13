@@ -4,6 +4,7 @@ type IconName =
   | "boards"
   | "plus"
   | "close"
+  | "calendar"
   | "trash"
   | "edit"
   | "more"
@@ -64,6 +65,13 @@ export function Icon({ name, className }: IconProps) {
         <svg {...baseProps}>
           <path d="M6 6l12 12" />
           <path d="M18 6L6 18" />
+        </svg>
+      );
+    case "calendar":
+      return (
+        <svg {...baseProps}>
+          <rect x="3.5" y="5" width="17" height="15.5" rx="2" />
+          <path d="M7.5 3.5v3M16.5 3.5v3M3.5 9.5h17" />
         </svg>
       );
     case "trash":

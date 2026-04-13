@@ -1,5 +1,8 @@
+from datetime import timedelta
+
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
 from boards.models import Board, Column, Card
 
@@ -12,6 +15,7 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         email = "demo@example.com"
         password = "demo1234"
+        today = timezone.localdate()
 
         user, created = User.objects.get_or_create(email=email)
 
@@ -48,32 +52,44 @@ class Command(BaseCommand):
         )
 
         # cards
-        Card.objects.get_or_create(
+        Card.objects.update_or_create(
             column=todo,
             title="Setup project",
-            description="Initialize Django and React",
-            position=0,
+            defaults={
+                "description": "Initialize Django and React",
+                "position": 0,
+                "due_date": today,
+            },
         )
 
-        Card.objects.get_or_create(
+        Card.objects.update_or_create(
             column=todo,
             title="Create authentication",
-            description="JWT with refresh cookie",
-            position=1,
+            defaults={
+                "description": "JWT with refresh cookie",
+                "position": 1,
+                "due_date": today + timedelta(days=2),
+            },
         )
 
-        Card.objects.get_or_create(
+        Card.objects.update_or_create(
             column=doing,
             title="Build boards UI",
-            description="React Query + forms",
-            position=0,
+            defaults={
+                "description": "React Query + forms",
+                "position": 0,
+                "due_date": today + timedelta(days=4),
+            },
         )
 
-        Card.objects.get_or_create(
+        Card.objects.update_or_create(
             column=done,
             title="Design architecture",
-            description="Feature-based React structure",
-            position=0,
+            defaults={
+                "description": "Feature-based React structure",
+                "position": 0,
+                "due_date": today - timedelta(days=2),
+            },
         )
 
         self.stdout.write(self.style.SUCCESS("Demo data seeded successfully"))

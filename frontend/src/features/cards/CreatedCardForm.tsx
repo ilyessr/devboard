@@ -18,6 +18,7 @@ const createCardSchema = z.object({
     .max(500, "La description doit contenir au maximum 500 caractères")
     .optional()
     .or(z.literal("")),
+  due_date: z.string().optional().or(z.literal("")),
 });
 
 type CreateCardFormValues = z.infer<typeof createCardSchema>;
@@ -37,13 +38,14 @@ export function CreateCardForm({ columnId }: Props) {
     formState: { errors },
   } = useForm<CreateCardFormValues>({
     resolver: zodResolver(createCardSchema),
-    defaultValues: { title: "", description: "" },
+    defaultValues: { title: "", description: "", due_date: "" },
   });
 
   const onSubmit = async (data: CreateCardFormValues) => {
     await createCard.mutateAsync({
       title: data.title,
       description: data.description || "",
+      due_date: data.due_date || null,
     });
     reset();
     setIsOpen(false);
@@ -70,6 +72,12 @@ export function CreateCardForm({ columnId }: Props) {
             {errors.description && (
               <p className="field-error">{errors.description.message}</p>
             )}
+          </label>
+
+          <label className="field">
+            <span>Date</span>
+            <input type="date" {...register("due_date")} />
+            {errors.due_date && <p className="field-error">{errors.due_date.message}</p>}
           </label>
 
           <button type="submit" className="btn btn-primary" disabled={createCard.isPending}>

@@ -42,6 +42,7 @@ class Card(models.Model):
     )
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
+    due_date = models.DateField(null=True, blank=True)
     position = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

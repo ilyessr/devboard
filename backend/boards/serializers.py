@@ -19,5 +19,13 @@ class ColumnSerializer(serializers.ModelSerializer):
 class CardSerializer(serializers.ModelSerializer):
     class Meta:
         model = Card
-        fields = ["id", "title", "description", "position", "created_at", "updated_at"]
+        fields = [
+            "id",
+            "title",
+            "description",
+            "due_date",
+            "position",
+            "created_at",
+            "updated_at",
+        ]
         read_only_fields = ["id", "position", "created_at", "updated_at"]

@@ -8,7 +8,7 @@ export async function getCards(columnId: number): Promise<Card[]> {
 
 export async function createCard(
   columnId: number,
-  input: { title: string; description?: string },
+  input: { title: string; description?: string; due_date?: string | null },
 ): Promise<Card> {
   const res = await apiClient.post(`boards/columns/${columnId}/cards/`, input);
   return res.data;
@@ -20,7 +20,13 @@ export async function deleteCard(cardId: number): Promise<void> {
 
 export async function updateCard(
   cardId: number,
-  input: { title?: string; description?: string; column?: number; position?: number },
+  input: {
+    title?: string;
+    description?: string;
+    due_date?: string | null;
+    column?: number;
+    position?: number;
+  },
 ): Promise<Card> {
   const res = await apiClient.patch(`boards/cards/${cardId}/`, input);
   return res.data;

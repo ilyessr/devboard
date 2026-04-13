@@ -1,5 +1,6 @@
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { EntityMenu } from "@/components/EntityMenu";
+import { Icon } from "@/components/Icon";
 import { Modal } from "@/components/Modal";
 import type { Card } from "@/features/cards/types";
 import type { DragEvent } from "react";
@@ -12,6 +13,11 @@ import { useCards, useDeleteCard, useUpdateCard } from "./hooks";
 
 const DND_CARD_MIME = "application/x-devboard-card";
 const DND_CARD_FALLBACK_MIME = "text/plain";
+const CARD_DATE_FORMATTER = new Intl.DateTimeFormat("fr-FR", {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+});
 
 const updateCardSchema = z.object({
   title: z
@@ -25,6 +31,7 @@ const updateCardSchema = z.object({
     .max(500, "La description doit contenir au maximum 500 caractères")
     .optional()
     .or(z.literal("")),
+  due_date: z.string().optional().or(z.literal("")),
 });
 
 type UpdateCardFormValues = z.infer<typeof updateCardSchema>;
@@ -59,6 +66,12 @@ function parseDraggedCard(event: DragEvent): DragCardPayload | null {
   }
 }
 
+function formatCardDate(value: string): string {
+  const parsed = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(parsed.getTime())) return value;
+  return CARD_DATE_FORMATTER.format(parsed);
+}
+
 export function ColumnCardList({ columnId }: Props) {
   const { data: cards, isLoading, isError } = useCards(columnId);
   const deleteCard = useDeleteCard(columnId);
@@ -84,7 +97,7 @@ export function ColumnCardList({ columnId }: Props) {
     formState: { errors },
   } = useForm<UpdateCardFormValues>({
     resolver: zodResolver(updateCardSchema),
-    defaultValues: { title: "", description: "" },
+    defaultValues: { title: "", description: "", due_date: "" },
   });
 
   useEffect(() => {
@@ -102,6 +115,7 @@ export function ColumnCardList({ columnId }: Props) {
     reset({
       title: cardToEdit.title,
       description: cardToEdit.description || "",
+      due_date: cardToEdit.due_date || "",
     });
   }, [cardToEdit, reset]);
 
@@ -164,7 +178,10 @@ export function ColumnCardList({ columnId }: Props) {
     if (!cardToEdit) return;
     await updateCard.mutateAsync({
       cardId: cardToEdit.id,
-      input: data,
+      input: {
+        ...data,
+        due_date: data.due_date || null,
+      },
     });
     setCardToEdit(null);
   };
@@ -281,7 +298,7 @@ export function ColumnCardList({ columnId }: Props) {
             }}
           >
             <div className="card-item__header">
-              <h3>{card.title}</h3>
+              <h3 className="card-item__title">{card.title}</h3>
               <EntityMenu
                 label={`carte ${card.title}`}
                 onEdit={() => setCardToEdit(card)}
@@ -291,7 +308,13 @@ export function ColumnCardList({ columnId }: Props) {
               />
             </div>
             {card.description && (
-              <p className="text-muted">{card.description}</p>
+              <p className="text-muted card-item__description">{card.description}</p>
+            )}
+            {card.due_date && (
+              <p className="card-item__date" aria-label={`Echeance ${formatCardDate(card.due_date)}`}>
+                <Icon name="calendar" className="icon card-item__date-icon" />
+                <span>{formatCardDate(card.due_date)}</span>
+              </p>
             )}
           </article>
         ))}
@@ -319,6 +342,13 @@ export function ColumnCardList({ columnId }: Props) {
             />
             {errors.description && (
               <p className="field-error">{errors.description.message}</p>
+            )}
+          </label>
+          <label className="field">
+            <span>Date</span>
+            <input type="date" {...register("due_date")} />
+            {errors.due_date && (
+              <p className="field-error">{errors.due_date.message}</p>
             )}
           </label>
           <button
