@@ -1,4 +1,7 @@
+import { Icon } from "@/components/Icon";
+import { Modal } from "@/components/Modal";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useCreateCard } from "./hooks";
@@ -7,12 +10,12 @@ const createCardSchema = z.object({
   title: z
     .string()
     .trim()
-    .min(2, "Card title must be at least 2 characters")
-    .max(100, "Card title must be at most 100 characters"),
+    .min(2, "Le titre doit contenir au moins 2 caractères")
+    .max(100, "Le titre doit contenir au maximum 100 caractères"),
   description: z
     .string()
     .trim()
-    .max(500, "Description must be at most 500 characters")
+    .max(500, "La description doit contenir au maximum 500 caractères")
     .optional()
     .or(z.literal("")),
 });
@@ -24,6 +27,7 @@ type Props = {
 };
 
 export function CreateCardForm({ columnId }: Props) {
+  const [isOpen, setIsOpen] = useState(false);
   const createCard = useCreateCard(columnId);
 
   const {
@@ -33,10 +37,7 @@ export function CreateCardForm({ columnId }: Props) {
     formState: { errors },
   } = useForm<CreateCardFormValues>({
     resolver: zodResolver(createCardSchema),
-    defaultValues: {
-      title: "",
-      description: "",
-    },
+    defaultValues: { title: "", description: "" },
   });
 
   const onSubmit = async (data: CreateCardFormValues) => {
@@ -45,35 +46,37 @@ export function CreateCardForm({ columnId }: Props) {
       description: data.description || "",
     });
     reset();
+    setIsOpen(false);
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 8,
-        marginBottom: 12,
-      }}
-    >
-      <input placeholder="Card title" {...register("title")} />
-      {errors.title && (
-        <p style={{ color: "red", margin: 0 }}>{errors.title.message}</p>
-      )}
-
-      <textarea
-        placeholder="Description (optional)"
-        rows={3}
-        {...register("description")}
-      />
-      {errors.description && (
-        <p style={{ color: "red", margin: 0 }}>{errors.description.message}</p>
-      )}
-
-      <button type="submit" disabled={createCard.isPending}>
-        {createCard.isPending ? "Adding..." : "Add card"}
+    <>
+      <button type="button" className="btn btn-ghost" onClick={() => setIsOpen(true)}>
+        <Icon name="plus" className="icon" />
+        <span>Nouvelle carte</span>
       </button>
-    </form>
+
+      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="Créer une carte">
+        <form className="form-stack" onSubmit={handleSubmit(onSubmit)}>
+          <label className="field">
+            <span>Titre</span>
+            <input placeholder="Implémenter la recherche" {...register("title")} />
+            {errors.title && <p className="field-error">{errors.title.message}</p>}
+          </label>
+
+          <label className="field">
+            <span>Description</span>
+            <textarea rows={4} placeholder="Détails optionnels..." {...register("description")} />
+            {errors.description && (
+              <p className="field-error">{errors.description.message}</p>
+            )}
+          </label>
+
+          <button type="submit" className="btn btn-primary" disabled={createCard.isPending}>
+            {createCard.isPending ? "Ajout..." : "Ajouter"}
+          </button>
+        </form>
+      </Modal>
+    </>
   );
 }

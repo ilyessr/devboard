@@ -17,3 +17,11 @@ export async function createColumn(
 export async function deleteColumn(columnId: number): Promise<void> {
   await apiClient.delete(`boards/columns/${columnId}/`);
 }
+
+export async function updateColumn(
+  columnId: number,
+  input: { name: string },
+): Promise<Column> {
+  const res = await apiClient.patch(`boards/columns/${columnId}/`, input);
+  return res.data;
+}

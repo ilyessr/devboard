@@ -17,3 +17,11 @@ export async function createCard(
 export async function deleteCard(cardId: number): Promise<void> {
   await apiClient.delete(`boards/cards/${cardId}/`);
 }
+
+export async function updateCard(
+  cardId: number,
+  input: { title?: string; description?: string; column?: number; position?: number },
+): Promise<Card> {
+  const res = await apiClient.patch(`boards/cards/${cardId}/`, input);
+  return res.data;
+}

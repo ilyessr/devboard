@@ -1,26 +1,58 @@
-import { Link, Outlet } from "react-router-dom";
+import { Icon } from "@/components/Icon";
+import { logout } from "@/features/auth/hooks";
+import { tokenStore } from "@/features/auth/tokenStore";
+import { useSyncExternalStore } from "react";
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 
 export function Layout() {
+  const navigate = useNavigate();
+  const token = useSyncExternalStore(
+    tokenStore.subscribe,
+    tokenStore.get,
+    tokenStore.get,
+  );
+  const isAuthenticated = Boolean(token);
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login", { replace: true });
+  };
+
   return (
-    <div style={{ fontFamily: "system-ui" }}>
-      <header
-        style={{
-          padding: 16,
-          borderBottom: "1px solid #eee",
-          display: "flex",
-          gap: 12,
-          alignItems: "center",
-        }}
-      >
-        <strong>DevBoard</strong>
-        <nav style={{ display: "flex", gap: 12 }}>
-          <Link to="/">Home</Link>
-          <Link to="/login">Login</Link>
-          <Link to="/boards">Boards</Link>
-        </nav>
+    <div className="app-shell">
+      <header className="topbar">
+        <div className="container topbar__inner">
+          <Link className="brand" to={isAuthenticated ? "/boards" : "/"}>
+            <Icon name="spark" className="icon" />
+            <span>DevBoard</span>
+          </Link>
+          <nav className="nav">
+            {isAuthenticated && (
+              <>
+                <NavLink
+                  to="/boards"
+                  className={({ isActive }) =>
+                    `nav-link${isActive ? " nav-link--active" : ""}`
+                  }
+                >
+                  <Icon name="boards" className="icon" />
+                  <span>Boards</span>
+                </NavLink>
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  onClick={handleLogout}
+                >
+                  <Icon name="logout" className="icon" />
+                  <span>Déconnexion</span>
+                </button>
+              </>
+            )}
+          </nav>
+        </div>
       </header>
 
-      <main style={{ padding: 24 }}>
+      <main className="container main-content">
         <Outlet />
       </main>
     </div>
